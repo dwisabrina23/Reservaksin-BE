@@ -85,8 +85,23 @@ func (ctrl *VaccineController) GetByID(c echo.Context) error {
 func (ctrl *VaccineController) FetchAll(c echo.Context) error {
 	res, err := ctrl.VaccineService.FetchAll()
 	if err != nil {
+		if strings.Contains(err.Error(), "empty") {
+			return controllers.NewEmptyDataResponse(c, res)
+		}
 		return controllers.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	return controllers.NewSuccesResponse(c, response.FromDomainArray(res))
+}
+
+func (ctrl *VaccineController) GetByAdminID(c echo.Context) error {
+	adminID := c.Param("id")
+	data, err := ctrl.VaccineService.GetByAdminID(adminID)
+	if err != nil {
+		if strings.Contains(err.Error(), "empty") {
+			return controllers.NewEmptyDataResponse(c, data)
+		}
+		return controllers.NewErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return controllers.NewSuccesResponse(c, response.FromDomainArray(data))
 }
